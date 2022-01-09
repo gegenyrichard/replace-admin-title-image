@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<modification>
+	<name>Replace admin image and title to real sotre data</name>
+	<id>RAIATTRSD</id>
+	<code>RAIATTRSD</code>
+	<link>https://www.renovatiomarketing.hu</link>
+	<version>1.0</version>
+	<author>G.Richard</author>
+
+	<file path="admin/controller/common/header.php">
+		<operation error="log">
+			<search><![CDATA[$data['title'] = $this->document->getTitle();]]></search>
+				<add position="replace"><![CDATA[
+					$store_name = $this->config->get('config_name');
+					$data['title'] = $store_name." - ".$this->document->getTitle();
+				]]></add>
+		</operation>
+		
+		<operation error="log">
+			<search><![CDATA[$this->load->language('common/header');]]></search>
+				<add position="after"><![CDATA[
+		/*+++*/
+		$this->load->model('tool/image');
+		
+		$store_logo = $this->config->get('config_logo');
+		$store_icon = $this->config->get('config_icon');
+		
+		if (is_file(DIR_IMAGE . $store_logo)) {
+			$data['store_logo'] = $this->model_tool_image->resize($store_logo, 180, 35);
+		} else {
+			$data['store_logo'] = 0;
+		}		
+		
+		if (is_file(DIR_IMAGE . $store_icon)) {
+			$data['store_icon'] = $this->model_tool_image->resize($store_icon, 100, 100);
+		} else {
+			$data['store_icon'] = 0;
+		}	
+		/*+++*/
+				]]></add>
+		</operation>
+	</file>
+
+	<file path="admin/view/template/common/header.twig">
+		<operation error="log">
+			<search><![CDATA[<title>{{ title }}</title>]]></search>
+				<add position="after"><![CDATA[
+{% if store_icon %}
+	<link href="{{ store_icon }}" rel="icon" />
+{% endif %}
+				]]></add>
+		</operation>
+		
+		<operation error="log">
+			<search><![CDATA[<div id="header-logo" class="navbar-header"><a href="{{ home }}" class="navbar-brand"><img src="view/image/logo.png" alt="{{ heading_title }}" title="{{ heading_title }}" /></a></div>]]></search>
+				<add position="replace"><![CDATA[
+	{% if store_logo %}
+		<div id="header-logo" class="navbar-header"><a href="{{ home }}" class="navbar-brand"><img src="{{ store_logo }}" alt="{{ heading_title }}" title="{{ heading_title }}" /></a></div>
+	{% else %}
+		<div id="header-logo" class="navbar-header"><a href="{{ home }}" class="navbar-brand"><img src="view/image/logo.png" alt="{{ heading_title }}" title="{{ heading_title }}" /></a></div>
+	{% endif %}
+				]]></add>
+		</operation>
+	</file>
+	
+	
+</modification>
+
+
